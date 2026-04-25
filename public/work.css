@@ -1,0 +1,356 @@
+/* 画像は左右余白なし */
+.full-main-image img,
+.sub-image-item img {
+  width: 100%;
+  display: block;
+  height: auto;
+}
+
+/* 文字情報ブロックだけ左右に余白 */
+.work-info-block {
+  padding: 0 15px;
+}
+
+#work-title{
+    font-family: "Times","Times New Roman","游明朝体","游明朝","Yu Mincho","YuMincho",serif;
+    font-size: 25px;
+    color: #4a4a4a;
+}
+#work-designer{
+    /*font-family: "Times","Times New Roman","游ゴシック","游ゴシック体","Yu Gothic","YuGothic",serif;*/
+    font-family: 'YakuHanJPs', 'Noto Sans JP', sans-serif;
+    font-size: 17px;
+    color: #4a4a4a;
+    margin: 10px 0 40px 0;
+}
+#work-concept{
+    /*font-family: "Times","Times New Roman","游ゴシック","游ゴシック体","Yu Gothic","YuGothic",serif;*/
+    font-family: 'YakuHanJPs', 'Noto Sans JP', sans-serif;
+    color: #4a4a4a;
+    font-size: 13px;
+    margin-top: 0px;
+    line-height: 1.8;
+    /*font-size: 0.95rem;*/
+    white-space: pre-wrap; /* 改行を反映させる */
+    max-width: 280px;     /* 箱組みのために横幅制限 */
+}
+.meta-info {
+  /*font-family: "Times","Times New Roman","游ゴシック","游ゴシック体","Yu Gothic","YuGothic",serif;*/
+  font-family: 'YakuHanJPs', 'Noto Sans JP', sans-serif;
+  display: flex;
+  flex-direction: column; /* 項目を縦に並べる */
+  margin: 20px 0 70px 0;
+  font-size: 13px;
+  line-height: 1.8;
+  color: #888;
+}
+/* 訪問済み（紫）やホバー時の色変化を無効化 */
+#work-contact a:visited {
+  color: #888;
+}
+
+/* 各行の設定 */
+.meta-row {
+  display: flex;
+  align-items: flex-start; /* 上揃え */
+  margin-bottom: 7px;      /* 行間の微調整 */
+}
+
+/* 「素材：」などのラベル部分 */
+.meta-label {
+  flex-shrink: 0;   /* ラベルが横に潰れないように固定 */
+  /*width: 5em;       /* これをつけると、：以降の項目の最初が全部の項目で揃う*/
+  white-space: nowrap;
+}
+
+/* 内容部分（改行されてもラベルの下に回り込まない） */
+.meta-content {
+  color: #888;
+  flex-grow: 1;
+  word-break: break-all; /* 長い単語でも枠内で改行させる */
+  white-space: pre-wrap; /* 改行を反映させる */
+  max-width: 220px;     /* 箱組みのために横幅制限 */
+}
+
+
+/* リンク共通ベース */
+.tag-link,
+#work-contact a {
+  color: #888;
+  text-decoration: none;
+  display: inline-block;
+  transition: color 0.3s ease;
+}
+
+
+
+
+
+/* サブ画像同士の間隔 */
+.sub-image-list {
+  display: flex;
+  flex-direction: column;
+  gap: 20px; /* 画像と画像の隙間 */
+}
+
+/* 動画・画像のラッパー */
+.content-item {
+  width: 100%;
+}
+
+/* 動画（iframe）のレスポンシブ対応 */
+.video-item iframe {
+  width: 100%;
+  aspect-ratio: 16 / 9;
+  border: none;
+  display: block;
+}
+/* ショート・縦長動画 */
+.video-item.vertical iframe {
+  aspect-ratio: 9 / 16;
+  max-width: 360px;
+}
+
+/* 画像の微調整（既存のものを整理） */
+.sub-image-item img {
+  width: 100%;
+  display: block;
+  height: auto;
+}
+
+
+
+
+/* 画像レイアウトの指定 */
+.image-layout-stamp img {
+  width: 55px;
+  height: auto;
+  display: block;
+  margin: 120px auto;
+}
+
+
+
+
+.content-wrapper.work-part{
+  width: 100%;
+}
+.content-wrapper.recommend-part {
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.work-grid.for-recommend{
+  width: 100%;
+  grid-template-columns: 1fr;
+}
+
+.recommend-list-title{
+  /*font-family: "Times","Times New Roman","游ゴシック","游ゴシック体","Yu Gothic","YuGothic",serif;*/
+  font-family: 'YakuHanJPs', 'Noto Sans JP', sans-serif;
+  color: #4a4a4a;
+  margin: 0 0 30px 12px;
+  font-size: 20px;
+}
+.return-to-Top{
+  margin-left: 40px;
+}
+.return-to-Top a{
+  color: #4a4a4a; /* aタグへの色継承 */
+  transition: color 0.3s ease;
+  text-decoration: none;
+}
+
+
+
+/* レコメンドで、作者名の右にできるレコメンド理由 */
+/* レコメンド理由のエリア */
+.rec-reason{
+  font-size: 13px;
+  color: #888;
+  width: 100%; /* 1行を占有させる */
+  transition: 0.3s ease;
+}
+
+
+
+
+
+
+
+/* ホバー演出がタッチする機材で残ったりしないように調整 */
+/* PC用 */
+@media (hover: hover) {
+  .tag-link:hover,
+  #work-contact a:hover,
+  .return-to-Top a:hover {
+  text-decoration: underline;
+  color: rgb(237, 45, 154);
+  transition: 0.3s ease;
+}
+.work-item-link:hover .rec-reason{
+  color: rgb(237, 45, 154);
+  transition: 0.3s ease;
+}
+}
+/* スマホ用 */
+@media (hover: none) {
+.tag-link:active,
+#work-contact a:active,
+.return-to-Top a:active {
+  text-decoration: underline;
+  color: rgb(237, 45, 154);
+  transition: 0s ease;
+}
+.work-item-link:active .rec-reason{
+  color: rgb(237, 45, 154);
+  transition: 0s ease;
+}
+
+}
+
+
+
+
+
+
+/* レスポンシブ */
+
+/* グリッド自体のmarginなどを変えずに、content-wrapperでmarginなどを変更する */
+
+/* --- モバイル（デフォルト：1カラム） --- */
+.work-part-grid {
+  display: grid;
+  grid-template-areas: 
+    "main-visual"
+    "info-block"
+    "sub-images";
+  gap: 16px; /* スマホ時の要素間の縦の隙間 */
+}
+/* HTMLのクラスに対して、Grid上の名前を割り当てる */
+#main-visual { grid-area: main-visual; }
+.work-info-block { grid-area: info-block; }
+.sub-image-list { grid-area: sub-images; }
+
+
+
+@media (min-width: 600px) {
+  .work-info-block {
+    margin-left: 5px;
+  }  
+
+  #work-concept{
+    max-width: 340px;
+  }
+  .meta-content {
+    max-width: 300px;
+  }
+
+}
+
+
+/* --- デスクトップ（2カラム） --- */
+@media (min-width: 820px) {
+  .content-wrapper.work-part {
+    padding-left: 5%;
+    padding-right: calc(40px + 5%);
+    max-width: 1500px;
+    margin: 30px auto 0 auto;
+    }
+
+  .work-part-grid {
+    display: grid;
+    /* 左に文字(fr)、右に画像(fr)の比率でカラムを作成 */
+    /* 文字(info)を左側に固定し、右側にメインとサブを並べる */
+    /* grid-template-columns: 1fr 1.8fr;   grid-template-areas: "info-block main-visual" "info-block sub-images"; */
+    /*上は文字カラムが左に、下は右に来る*/
+    grid-template-columns: 1.9fr 1fr;   grid-template-areas: "main-visual info-block" "sub-images info-block";
+
+
+    column-gap: 35px; /* 左右カラムの間の余白 */
+    row-gap: 20px;    /* メイン画像とサブ画像の間 */
+    align-items: flex-start; /* 中身を上揃えにする */
+    }
+  
+  /* 文字部分はスクロールに従って動くようにする */
+  .work-info-block {
+    grid-area: info-block;
+    position: sticky;
+    align-self: start; /* 個別に上端に配置 */
+    top: 50px; /* スクロールで上からどの部分で止まるか */
+    height: fit-content; /* 文字ブロック自身の高さで計算させる */
+  }
+
+  /* メイン画像：画像カラム内で横幅いっぱい */
+  .grid-main-image img {
+    width: 100%;
+    display: block;
+  }
+
+  #work-title{
+    font-size: 32px;
+    max-width: 370px;
+  }
+  #work-designer{
+    font-size: 18px;
+    margin-top: 12px;
+    margin-bottom: 0;
+  }
+  #work-concept{
+    font-size: 15px;
+    margin-top: 40px;
+    max-width: 370px;
+  }
+  .meta-info {
+    font-size: 15px;
+    line-height: 1.8;
+    margin-top: 40px;
+  }
+  .meta-content {
+    max-width: 290px;     /* 素材名部分の箱組み */
+  }
+
+
+
+  .content-wrapper.recommend-part{
+    padding-left: 10%;
+    padding-right: calc(10% + 40px);
+    margin: 0 auto;
+  }
+  .work-grid.for-recommend {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 30px;
+    width: 100%;
+    padding: 0;
+  }
+
+  .return-to-Top{
+    font-size: 18px;
+  }
+  .recommend-list-title{
+    margin: 0 0 30px 0px; /* other~のレコメンド部分タイトルを左寄せに */
+    font-size: 25px;
+  }
+
+  .work-info {
+    margin: 12px 4px 0 0px; /* topは作品名と画像の間の距離。rightとleftは左右の余白 */
+    padding: 0 0;
+  }
+
+
+}
+
+
+/* indexcssでの3列指定をworkhtmlでは上書きさせる */
+@media (min-width: 1180px) {
+  .work-part-grid {
+    column-gap: 60px; /* 左右カラムの間の余白 */
+  }
+
+  .content-wrapper.recommend-part{
+    padding-left: 10%;
+    padding-right: calc(40px + 10%);
+    max-width: 1600px;
+  }
+}
+
