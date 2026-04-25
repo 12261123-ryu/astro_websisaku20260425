@@ -3,20 +3,20 @@ async function loadWorkDetail() {
   if (!work) return;
 
   try {
-    const projectRes = await fetch('/project.json');
+    const [projectRes, worksRes] = await Promise.all([
+      fetch('/project.json'),
+      fetch('/work.json')
+    ]);
     const projectData = await projectRes.json();
     const knownMaterials = projectData.filter_keywords.map(item => item.id);
-
-    renderWorkPage(work, knownMaterials);
-
-    const worksRes = await fetch('/work.json');
     const works = await worksRes.json();
-    renderRecommendations(work, works, knownMaterials);
 
+    // つぶつぶカラー変更
     if (window.updateTubuColors) {
       window.updateTubuColors(work.project);
     }
 
+    // 閲覧数カウント
     const visitedWorks = JSON.parse(sessionStorage.getItem('visitedWorks') || '[]');
     if (!visitedWorks.includes(work.en_name)) {
       visitedWorks.push(work.en_name);
@@ -30,221 +30,46 @@ async function loadWorkDetail() {
       }
     }
 
+    // 戻るリンクにfilterパラメータを付ける
     const lastFilter = sessionStorage.getItem('lastFilter');
     const returnLink = document.querySelector('.return-to-Top a');
-    //一覧ページで絞り込む・絞り込みを解除・個別ページから素材または所属タグで一覧に飛ぶ、の3つではスクロールを一番上にリセット
-    //ブラウザの戻る・個別ページでの「一覧に戻る」クリックではスクロール量を保存する
-    if (returnLink) {
-  if (lastFilter) {
-    returnLink.href = `/?filter=${lastFilter}`;
-  }
-  // 「一覧に戻る」クリック時のみscrollYを保持、それ以外は削除
-  returnLink.addEventListener('click', () => {
-    // scrollYはそのまま保持（復元のため）
-  });
-}
+    if (returnLink && lastFilter) {
+      returnLink.href = `/?filter=${lastFilter}`;
+    }
+
+    // 素材・所属タグのクリックでスクロールリセット
+    document.querySelectorAll('.tag-link').forEach(link => {
+      link.addEventListener('click', () => {
+        sessionStorage.removeItem('scrollY');
+      });
+    });
+
+    // Instagram埋め込み
+    document.querySelectorAll('[data-instagram-url]').forEach(el => {
+      const instaUrl = el.dataset.instagramUrl;
+      el.innerHTML = `
+        <blockquote class="instagram-media"
+          data-instgrm-permalink="${instaUrl}"
+          data-instgrm-version="14"
+          style="width:100%; max-width:360px;">
+        </blockquote>`;
+      if (!document.getElementById('instagram-embed-script')) {
+        const script = document.createElement('script');
+        script.id = 'instagram-embed-script';
+        script.src = 'https://www.instagram.com/embed.js';
+        script.async = true;
+        document.body.appendChild(script);
+      } else if (window.instgrm) {
+        window.instgrm.Embeds.process();
+      }
+    });
+
+    // レコメンド
+    renderRecommendations(work, works, knownMaterials);
 
   } catch (error) {
     console.error("エラー:", error);
   }
-}
-
-function renderWorkPage(work, knownMaterials = []) {
-  const mainDisplayImage = (work.image_list && work.image_list.length > 0) ? work.image_list[0] : work.main_image;
-  document.getElementById('main-visual').innerHTML = `<img src="${mainDisplayImage}" style="width:100%; height:auto;" decoding="async" alt="" onerror="this.style.background='#f9f9f9'; this.removeAttribute('src'); this.style.display='block'; this.style.width='100%';">`;
-
-  document.getElementById('work-title').innerText = work.title;
-  document.getElementById('work-designer').innerText = work.name;
-  document.getElementById('work-concept').innerText = work.concept;
-
-  const projectElem = document.getElementById('work-project');
-  if (work.project === "M") {
-    const masterDetail = work.Master_project ? `（${work.Master_project}）` : "";
-    projectElem.innerHTML = `<a href="/?filter=M" class="tag-link">#大学院${masterDetail}</a>`;
-  } else {
-    projectElem.innerHTML = `<a href="/?filter=${work.project}" class="tag-link">#${work.project}プロジェクト</a>`;
-  }
-
-  const matElem = document.getElementById('work-materials');
-  if (matElem && work.materials && Array.isArray(work.materials)) {
-    const knowns = [];
-    const others = [];
-
-    work.materials.forEach(m => {
-      const trimmedM = m.trim();
-      if (!trimmedM) return;
-      const baseM = trimmedM.replace(/（.*）|\(.*\)/, '').trim();
-      if (knownMaterials.includes(baseM)) {
-        knowns.push(`<a href="/?filter=${baseM}" class="tag-link">#${trimmedM}</a>`);
-      } else {
-        others.push(trimmedM);
-      }
-    });
-
-    let displayParts = [];
-    if (knowns.length > 0) displayParts.push(knowns.join('、'));
-    if (others.length > 0) {
-      displayParts.push(`<a href="/?filter=その他" class="tag-link">#その他（${others.join('、')}）</a>`);
-    }
-    matElem.innerHTML = displayParts.join('、');
-  }
-
-  const contactArea = document.getElementById('work-contact-area');
-  const contactElem = document.getElementById('work-contact');
-
-  if (work.contact && work.contact.type && work.contact.id) {
-    const type = work.contact.type.toLowerCase().trim();
-    let id = work.contact.id.toString().trim();
-    let linkUrl = "";
-    let displayText = "";
-
-    if (type === "instagram") {
-      const cleanId = id.replace('@', '');
-      linkUrl = `https://www.instagram.com/${cleanId}/`;
-      displayText = `Instagram @${cleanId}`;
-    } else if (type === "x" || type === "twitter") {
-      const cleanId = id.replace('@', '');
-      linkUrl = `https://x.com/${cleanId}/`;
-      displayText = `X @${cleanId}`;
-    } else if (type === "email") {
-      const fullEmail = id.includes('@') ? id : `${id}@gmail.com`;
-      linkUrl = `mailto:${fullEmail}`;
-      displayText = fullEmail;
-    }
-
-    if (linkUrl && contactArea) {
-      contactArea.style.display = 'flex';
-      contactElem.innerHTML = `<a href="${linkUrl}" target="_blank" rel="noopener noreferrer">${displayText}</a>`;
-    }
-  } else {
-    if (contactArea) contactArea.style.display = 'none';
-  }
-
-  if (work.link && work.link_type === 'web') {
-    const webLinkElem = document.getElementById('work-contact-area');
-    const webLinkContent = document.getElementById('work-contact');
-    if (webLinkElem && webLinkContent) {
-      webLinkElem.style.display = 'flex';
-      const existingContent = webLinkContent.innerHTML;
-      const separator = existingContent ? '<br>' : '';
-      webLinkContent.innerHTML += `${separator}<a href="${work.link}" target="_blank" rel="noopener noreferrer">個人ウェブサイト</a>`;
-    }
-  }
-
-  const subContentContainer = document.getElementById('sub-images');
-  if (subContentContainer) {
-    subContentContainer.innerHTML = '';
-
-    const renderVideos = () => {
-      if (work.video_list && work.video_list.length > 0) {
-        work.video_list.forEach(url => {
-          const trimmedUrl = url.toString().trim();
-          let embedHtml = null;
-          let isVertical = false;
-
-          const youtubeMatch = trimmedUrl.match(/(?:v=|shorts\/|youtu\.be\/|embed\/)([a-zA-Z0-9_-]{11})/);
-          if (youtubeMatch) {
-            isVertical = trimmedUrl.includes('shorts/') || (work.video_class && work.video_class.includes('vertical'));
-            embedHtml = `<iframe src="https://www.youtube.com/embed/${youtubeMatch[1]}" allowfullscreen></iframe>`;
-          }
-
-          if (!embedHtml) {
-            const vimeoMatch = trimmedUrl.match(/vimeo\.com\/(?:video\/)?(\d+)/);
-            if (vimeoMatch) {
-              isVertical = work.link_type === 'vimeo' || (work.video_class && work.video_class.includes('vertical'));
-              embedHtml = `<iframe src="https://player.vimeo.com/video/${vimeoMatch[1]}" allowfullscreen></iframe>`;
-            }
-          }
-
-          if (!embedHtml) {
-            const driveMatch = trimmedUrl.match(/drive\.google\.com\/file\/d\/([a-zA-Z0-9_-]+)/);
-            if (driveMatch) {
-              embedHtml = `<iframe src="https://drive.google.com/file/d/${driveMatch[1]}/preview" allowfullscreen></iframe>`;
-            }
-          }
-
-          if (!embedHtml) {
-            const instaMatch = trimmedUrl.match(/instagram\.com\/(p|reel|tv)\/([a-zA-Z0-9_-]+)/);
-            if (instaMatch) {
-              const instaUrl = `https://www.instagram.com/${instaMatch[1]}/${instaMatch[2]}/`;
-              subContentContainer.insertAdjacentHTML('beforeend', `
-                <div class="content-item video-item vertical">
-                  <blockquote class="instagram-media"
-                    data-instgrm-permalink="${instaUrl}"
-                    data-instgrm-version="14"
-                    style="width:100%; max-width:360px;">
-                  </blockquote>
-                </div>
-              `);
-              if (!document.getElementById('instagram-embed-script')) {
-                const script = document.createElement('script');
-                script.id = 'instagram-embed-script';
-                script.src = 'https://www.instagram.com/embed.js';
-                script.async = true;
-                document.body.appendChild(script);
-              } else if (window.instgrm) {
-                window.instgrm.Embeds.process();
-              }
-              return;
-            }
-          }
-
-          if (embedHtml) {
-            const verticalClass = isVertical ? ' vertical' : '';
-            subContentContainer.insertAdjacentHTML('beforeend', `
-              <div class="content-item video-item${verticalClass}">
-                ${embedHtml}
-              </div>`);
-          }
-        });
-      }
-    };
-
-    const renderImages = () => {
-      if (work.image_list && work.image_list.length > 0) {
-        work.image_list.forEach((item, index) => {
-          if (index === 0) return;
-          const imgPath = typeof item === 'string' ? item : item.path;
-          const layout = typeof item === 'object' && item.layout ? item.layout : null;
-          const width = typeof item === 'object' && item.width ? item.width : null;
-          const layoutClass = layout ? ` image-layout-${layout}` : '';
-          const widthStyle = width ? `style="width:${width}%"` : '';
-          subContentContainer.insertAdjacentHTML('beforeend', `
-            <div class="content-item sub-image-item${layoutClass}">
-              <img src="${imgPath}" loading="lazy" decoding="async" ${widthStyle}
-              onerror="this.style.background='#f9f9f9'; this.removeAttribute('src');">
-            </div>`);
-        });
-      }
-    };
-
-    if (work.video_to_last) {
-      renderImages();
-      renderVideos();
-    } else {
-      renderVideos();
-      renderImages();
-    }
-
-    if (work.link && work.link_type === 'pdf') {
-      const driveMatch = work.link.match(/drive\.google\.com\/file\/d\/([a-zA-Z0-9_-]+)/);
-      if (driveMatch) {
-        subContentContainer.insertAdjacentHTML('beforeend', `
-          <div class="content-item pdf-item">
-            <iframe src="https://drive.google.com/file/d/${driveMatch[1]}/preview"
-              style="width:100%; height:600px; border:none;">
-            </iframe>
-          </div>`);
-      }
-    }
-  }
-
-  document.querySelectorAll('.tag-link').forEach(link => {
-  link.addEventListener('click', () => {
-    sessionStorage.removeItem('scrollY');
-  });
-});
-
 }
 
 function renderRecommendations(currentWork, allWorks, knownMaterials) {
