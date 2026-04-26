@@ -20,6 +20,7 @@ if (menuTopLink) {
   menuTopLink.addEventListener('click', () => {
     sessionStorage.removeItem('lastFilter');
     sessionStorage.removeItem('scrollY');
+    sessionStorage.removeItem('isEntering'); // ←追加
     // bodyスクロールなのでwindow.scrollToでトップへ
     window.scrollTo(0, 0);
   });
