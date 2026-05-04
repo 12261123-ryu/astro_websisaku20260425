@@ -63,4 +63,4 @@ async function loadCredit() {
   }
 }
 
-window.onload = loadCredit;
+window.addEventListener('load', loadCredit);

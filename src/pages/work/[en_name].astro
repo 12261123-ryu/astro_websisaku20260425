@@ -1,12 +1,135 @@
 ---
-import works from '../../data/work.json';
+import worksData from '../../data/work.json';
+import projectData from '../../data/project.json';
 
 export function getStaticPaths() {
-  return works.map(work => ({
-    params: { en_name: work.en_name }
+  return worksData.map(work => ({
+    params: { en_name: work.en_name },
+    props: { work }
   }));
 }
+
+const { work } = Astro.props;
+const knownMaterials = projectData.filter_keywords.map(item => item.id);
+
+// 所属タグ
+const projectTag = work.project === "M"
+  ? `<a href="/?filter=M" class="tag-link">#大学院${work.Master_project ? `（${work.Master_project}）` : ""}</a>`
+  : `<a href="/?filter=${work.project}" class="tag-link">#${work.project}プロジェクト</a>`;
+
+// 素材タグ
+const knowns = [];
+const others = [];
+if (work.materials && Array.isArray(work.materials)) {
+  work.materials.forEach(m => {
+    const trimmedM = m.trim();
+    if (!trimmedM) return;
+    const baseM = trimmedM.replace(/（.*）|\(.*\)/, '').trim();
+    if (knownMaterials.includes(baseM)) {
+      knowns.push(`<a href="/?filter=${baseM}" class="tag-link">#${trimmedM}</a>`);
+    } else {
+      others.push(trimmedM);
+    }
+  });
+}
+const materialParts = [];
+if (knowns.length > 0) materialParts.push(knowns.join('、'));
+if (others.length > 0) materialParts.push(`<a href="/?filter=その他" class="tag-link">#その他（${others.join('、')}）</a>`);
+const materialsHtml = materialParts.join('、');
+
+// メイン画像
+const mainDisplayImage = (work.image_list && work.image_list.length > 0)
+  ? (typeof work.image_list[0] === 'string' ? work.image_list[0] : work.image_list[0].path)
+  : work.thumbnail;
+const imgW = work.firstImage_width || '';
+const imgH = work.firstImage_height || '';
+const sizeAttrs = imgW && imgH ? `width="${imgW}" height="${imgH}"` : '';
+
+// 連絡先
+let contactHtml = '';
+let webLinkHtml = '';
+if (work.contact && work.contact.type && work.contact.id) {
+  const type = work.contact.type.toLowerCase().trim();
+  const id = work.contact.id.toString().trim();
+  if (type === "instagram") {
+    const cleanId = id.replace('@', '');
+    contactHtml = `<a href="https://www.instagram.com/${cleanId}/" target="_blank" rel="noopener noreferrer">Instagram @${cleanId}</a>`;
+  } else if (type === "x" || type === "twitter") {
+    const cleanId = id.replace('@', '');
+    contactHtml = `<a href="https://x.com/${cleanId}/" target="_blank" rel="noopener noreferrer">X @${cleanId}</a>`;
+  } else if (type === "email") {
+    const fullEmail = id.includes('@') ? id : `${id}@gmail.com`;
+    contactHtml = `<a href="mailto:${fullEmail}">${fullEmail}</a>`;
+  }
+}
+if (work.contact_web) {
+  webLinkHtml = `<a href="${work.contact_web}" target="_blank" rel="noopener noreferrer">個人ウェブサイト</a>`;
+}
+
+// 動画
+const videoHtmlList = [];
+if (work.video_list && work.video_list.length > 0) {
+  work.video_list.forEach(url => {
+    const trimmedUrl = url.toString().trim();
+    const youtubeMatch = trimmedUrl.match(/(?:v=|shorts\/|youtu\.be\/|embed\/)([a-zA-Z0-9_-]{11})/);
+    if (youtubeMatch) {
+      const isVertical = trimmedUrl.includes('shorts/') || (work.video_class && work.video_class.includes('vertical'));
+      videoHtmlList.push(`<div class="content-item video-item${isVertical ? ' vertical' : ''}"><iframe src="https://www.youtube.com/embed/${youtubeMatch[1]}" allowfullscreen></iframe></div>`);
+      return;
+    }
+    const vimeoMatch = trimmedUrl.match(/vimeo\.com\/(?:video\/)?(\d+)/);
+    if (vimeoMatch) {
+      const isVertical = work.video_class && work.video_class.includes('vertical');
+      videoHtmlList.push(`<div class="content-item video-item${isVertical ? ' vertical' : ''}"><iframe src="https://player.vimeo.com/video/${vimeoMatch[1]}" allowfullscreen></iframe></div>`);
+      return;
+    }
+    const driveMatch = trimmedUrl.match(/drive\.google\.com\/file\/d\/([a-zA-Z0-9_-]+)/);
+    if (driveMatch) {
+      videoHtmlList.push(`<div class="content-item video-item"><iframe src="https://drive.google.com/file/d/${driveMatch[1]}/preview" allowfullscreen></iframe></div>`);
+      return;
+    }
+    const instaMatch = trimmedUrl.match(/instagram\.com\/(p|reel|tv)\/([a-zA-Z0-9_-]+)/);
+    if (instaMatch) {
+      videoHtmlList.push(`<div class="content-item video-item vertical" data-instagram-url="https://www.instagram.com/${instaMatch[1]}/${instaMatch[2]}/"></div>`);
+    }
+  });
+}
+
+// サブ画像（4:3プレースホルダー付き）
+const imageHtmlList = [];
+if (work.image_list && work.image_list.length > 0) {
+  work.image_list.forEach((item, index) => {
+    if (index === 0) return;
+    const imgPath = typeof item === 'string' ? item : item.path;
+    const layout = typeof item === 'object' && item.layout ? item.layout : null;
+    const width = typeof item === 'object' && item.width ? item.width : null;
+    const layoutClass = layout ? ` image-layout-${layout}` : '';
+    const widthStyle = width ? `width:${width}%;` : 'width:100%;';
+    imageHtmlList.push(`<div class="content-item sub-image-item${layoutClass}"><img src="${imgPath}" loading="lazy" decoding="async" style="${widthStyle} aspect-ratio:4/3; background-color:#f9f9f9;" onload="this.style.aspectRatio=''; this.style.backgroundColor='';" onerror="this.style.background='#f9f9f9'; this.removeAttribute('src');"></div>`);
+  });
+}
+
+// PDF
+let pdfHtml = '';
+if (work.link && work.link_type === 'pdf') {
+  const driveMatch = work.link.match(/drive\.google\.com\/file\/d\/([a-zA-Z0-9_-]+)/);
+  if (driveMatch) {
+    pdfHtml = `<div class="content-item pdf-item"><iframe src="https://drive.google.com/file/d/${driveMatch[1]}/preview" style="width:100%; height:600px; border:none;"></iframe></div>`;
+  }
+}
+
+// 動画・画像の順番
+const subContentHtml = work.video_to_last
+  ? [...imageHtmlList, ...videoHtmlList, pdfHtml].join('')
+  : [...videoHtmlList, ...imageHtmlList, pdfHtml].join('');
+
+// metaDescription
+const metaDescription = `多摩美術大学統合デザイン学科卒業・修了制作展2026のweb図録、${work.name}による作品「${work.title}」のページです。`;
 ---
+
+
+
+
 
 <!DOCTYPE html>
 <html lang="ja">
@@ -14,8 +137,8 @@ export function getStaticPaths() {
     <meta charset="UTF-8">
     <meta name="robots" content="noindex, nofollow">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="">
-    <title>work / 統合デザイン学科卒業・修了制作展2026 / web図録</title>
+    <meta name="description" content={metaDescription}>
+    <title>{work.title} / 統合デザイン学科卒業・修了制作展2026 / web図録</title>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/yakuhanJPs/yakuhanJPs.min.css">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -41,32 +164,40 @@ export function getStaticPaths() {
   <div class="work-main-content">
     <div class="content-wrapper work-part">
     <div class="work-part-grid">
-      <div id="main-visual" class="full-main-image"></div>
+      <div id="main-visual" class="full-main-image">
+          <img src={mainDisplayImage} style="width:100%; height:auto;" decoding="async" alt="" {...(imgW && imgH ? {width: imgW, height: imgH} : {})} onerror="this.style.background='#f9f9f9'; this.removeAttribute('src'); this.style.display='block'; this.style.width='100%';">
+      </div>
 
       <section class="work-info-block">
-        <div id="work-title"></div>
-        <div id="work-designer"></div>
-        <div id="work-concept"></div>
+        <div id="work-title">{work.title}</div>
+        <div id="work-designer">{work.name}</div>
+        <div id="work-concept">{work.concept}</div>
       
         <div class="meta-info">
           <div class="meta-row">
             <span class="meta-label">所属：</span>
-            <span id="work-project" class="meta-content"></span>
+            <span id="work-project" class="meta-content" set:html={projectTag}></span>
           </div>
   
           <div class="meta-row">
             <span class="meta-label">素材：</span>
-            <span id="work-materials" class="meta-content"></span>
+            <span id="work-materials" class="meta-content" set:html={materialsHtml}></span>
           </div>
 
-          <div id="work-contact-area" class="meta-row">
-            <span class="meta-label">連絡先：</span>
-            <span id="work-contact" class="meta-content"></span>
-          </div>
+          {(contactHtml || webLinkHtml) ? (
+            <div id="work-contact-area" class="meta-row">
+                <span class="meta-label">連絡先：</span>
+                <span id="work-contact" class="meta-content">
+                <span set:html={contactHtml}></span>
+                {contactHtml && webLinkHtml && <br/>}
+                <span set:html={webLinkHtml}></span>
+                </span>
+            </div>
+            ) : null}
         </div>
       </section>
 
-      <div id="sub-images" class="sub-image-list"></div>
+      <div id="sub-images" class="sub-image-list" set:html={subContentHtml}></div>
 
     </div>
 
