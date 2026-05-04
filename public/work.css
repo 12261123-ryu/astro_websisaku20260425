@@ -6,13 +6,23 @@
   height: auto;
 }
 
+.full-main-image {
+  background-color: #f9f9f9;
+}
+
+
 /* 文字情報ブロックだけ左右に余白 */
 .work-info-block {
   padding: 0 15px;
 }
 
 #work-title{
-    font-family: "Times","Times New Roman","游明朝体","游明朝","Yu Mincho","YuMincho",serif;
+    font-family: "Times","Times New Roman","YuMincho-Medium","游明朝体","游明朝","Yu Mincho","YuMincho","Hiragino Mincho ProN","ヒラギノ明朝 ProN",'Noto Serif JP',serif;
+    font-size: 25px;
+    color: #4a4a4a;
+}
+.sub-work-title{
+    font-family: "Times","Times New Roman","YuMincho-Medium","游明朝体","游明朝","Yu Mincho","YuMincho","Hiragino Mincho ProN","ヒラギノ明朝 ProN",'Noto Serif JP',serif;
     font-size: 25px;
     color: #4a4a4a;
 }
@@ -29,6 +39,17 @@
     color: #4a4a4a;
     font-size: 13px;
     margin-top: 0px;
+    line-height: 1.8;
+    /*font-size: 0.95rem;*/
+    white-space: pre-wrap; /* 改行を反映させる */
+    max-width: 280px;     /* 箱組みのために横幅制限 */
+}
+.sub-work-concept{
+    /*font-family: "Times","Times New Roman","游ゴシック","游ゴシック体","Yu Gothic","YuGothic",serif;*/
+    font-family: 'YakuHanJPs', 'Noto Sans JP', sans-serif;
+    color: #4a4a4a;
+    font-size: 13px;
+    margin-top: 20px;
     line-height: 1.8;
     /*font-size: 0.95rem;*/
     white-space: pre-wrap; /* 改行を反映させる */
@@ -111,13 +132,6 @@
   max-width: 360px;
 }
 
-/* 画像の微調整（既存のものを整理） */
-.sub-image-item img {
-  width: 100%;
-  display: block;
-  height: auto;
-}
-
 
 
 
@@ -174,6 +188,11 @@
 
 
 
+/*宮内さんのページだけ、文字部分がついてこないようにする*/
+.exception-page .work-info-block {
+  position: static;
+}
+
 
 
 
@@ -189,6 +208,12 @@
   transition: 0.3s ease;
 }
 .work-item-link:hover .rec-reason{
+  color: rgb(237, 45, 154);
+  transition: 0.3s ease;
+}
+
+.wide-return a:hover{
+  text-decoration: underline;
   color: rgb(237, 45, 154);
   transition: 0.3s ease;
 }
@@ -242,10 +267,18 @@
   #work-concept{
     max-width: 340px;
   }
+  .sub-work-concept{
+    max-width: 340px;
+  }
   .meta-content {
     max-width: 300px;
   }
 
+  .content-wrapper.recommend-part{
+    padding-left: 7%;
+    padding-right: calc(7% + 40px);
+    margin: 0 auto;
+  }
 }
 
 
@@ -264,14 +297,20 @@
     /* 文字(info)を左側に固定し、右側にメインとサブを並べる */
     /* grid-template-columns: 1fr 1.8fr;   grid-template-areas: "info-block main-visual" "info-block sub-images"; */
     /*上は文字カラムが左に、下は右に来る*/
-    grid-template-columns: 1.9fr 1fr;   grid-template-areas: "main-visual info-block" "sub-images info-block";
+    grid-template-columns: 1.9fr 1fr;
+    grid-template-rows: auto 1fr; /*黄さんの表示で崩れがあり追加*/
+    grid-template-areas: 
+        "main-visual info-block"
+        "sub-images info-block";
 
 
     column-gap: 35px; /* 左右カラムの間の余白 */
     row-gap: 20px;    /* メイン画像とサブ画像の間 */
     align-items: flex-start; /* 中身を上揃えにする */
+    
     }
-  
+
+
   /* 文字部分はスクロールに従って動くようにする */
   .work-info-block {
     grid-area: info-block;
@@ -291,12 +330,21 @@
     font-size: 32px;
     max-width: 370px;
   }
+  .sub-work-title{
+    font-size: 32px;
+    max-width: 370px;
+  }
   #work-designer{
     font-size: 18px;
     margin-top: 12px;
     margin-bottom: 0;
   }
   #work-concept{
+    font-size: 15px;
+    margin-top: 40px;
+    max-width: 370px;
+  }
+  .sub-work-concept{
     font-size: 15px;
     margin-top: 40px;
     max-width: 370px;
@@ -343,14 +391,39 @@
 
 /* indexcssでの3列指定をworkhtmlでは上書きさせる */
 @media (min-width: 1180px) {
+
+  .work-page-wrapper {
+    gap: 60px; /*作品表示部分とメニュー部分の間の余白距離*/
+    max-width: 1500px; /*作品表示〜メニューまで全てのカラム全体での最大幅*/
+    margin: 0 auto;
+    box-sizing: border-box;
+  }
+
+  .content-wrapper.recommend-part{
+    padding-left: 15%; /*15%にして、一覧3列での画像サイズとレコメンドでの画像サイズを近くした(完全に同じは難しいと思うので、おおまかに近く見える程度で一旦試し)*/
+    padding-right: 15%;
+    margin: 0 auto;
+  }
+  .work-grid.for-recommend {
+    gap: 55px; /*レコメンドでの、グリッドの間隔*/
+  }
+
+
+  .content-wrapper.work-part {
+    padding-left: 3%;
+    padding-right: 3%;
+    }
+
   .work-part-grid {
     column-gap: 60px; /* 左右カラムの間の余白 */
   }
 
-  .content-wrapper.recommend-part{
-    padding-left: 10%;
-    padding-right: calc(40px + 10%);
-    max-width: 1600px;
+  .work-main-content {
+    flex: 1;
+    min-width: 0;
   }
+
+
+
 }
 
