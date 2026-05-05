@@ -574,7 +574,7 @@ footer{
   display: flex;
   font-size: 12px;
   line-height: 1.5;
-  padding-bottom: 5px;
+  padding-bottom: 20px;
   max-width: 360px;
 }
 .footer-text{
@@ -583,7 +583,11 @@ footer{
   font-size: 18px;
   line-height: 1.5;
   padding-bottom: 30px;
-  gap: 10px;
+  gap: 20px;
+}
+.footer-text-ja,
+.footer-text-en {
+  margin: 0;
 }
 .footer-logos{
   display: flex;
