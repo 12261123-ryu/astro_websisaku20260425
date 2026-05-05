@@ -176,6 +176,13 @@
 }
 
 
+.notfound{
+  font-family: "Times","Times New Roman","YuMincho-Medium","游明朝体","游明朝","Yu Mincho","YuMincho","Hiragino Mincho ProN","ヒラギノ明朝 ProN",'Noto Serif JP',serif;
+  font-size: 18px;
+  color: #4a4a4a;
+  margin-left: 30px;
+}
+
 
 /* レコメンドで、作者名の右にできるレコメンド理由 */
 /* レコメンド理由のエリア */
@@ -383,6 +390,11 @@
   .work-info {
     margin: 12px 4px 0 0px; /* topは作品名と画像の間の距離。rightとleftは左右の余白 */
     padding: 0 0;
+  }
+
+
+  .notfound{
+    margin-left: 0px;
   }
 
 
