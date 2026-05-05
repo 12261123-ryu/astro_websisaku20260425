@@ -295,7 +295,7 @@
     padding-left: 5%;
     padding-right: calc(40px + 5%);
     max-width: 1500px;
-    margin: 0px auto 0 auto;
+    margin: 30px auto 0 auto;
     }
 
   .work-part-grid {
@@ -323,7 +323,7 @@
     grid-area: info-block;
     position: sticky;
     align-self: start; /* 個別に上端に配置 */
-    top: 0px; /* スクロールで上からどの部分で止まるか */
+    top: 30px; /* スクロールで上からどの部分で止まるか */
     margin-top: 0px;
     height: fit-content; /* 文字ブロック自身の高さで計算させる */
   }
