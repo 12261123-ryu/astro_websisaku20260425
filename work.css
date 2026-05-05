@@ -333,6 +333,10 @@
     display: block;
   }
 
+  .full-main-image{
+    margin-top: 20px;
+  }
+
   #work-title{
     font-size: 32px;
     max-width: 370px;
