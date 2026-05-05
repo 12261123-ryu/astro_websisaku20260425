@@ -583,7 +583,7 @@ footer{
   font-size: 18px;
   line-height: 1.5;
   padding-bottom: 30px;
-  gap: 20px;
+  gap: 10px;
 }
 .footer-logos{
   display: flex;
@@ -662,7 +662,7 @@ footer{
   }
   .footer-text {
     flex-direction: row; /* 広い画面は横 */
-    gap: 60px;
+    gap: 40px;
   }
 }
 
