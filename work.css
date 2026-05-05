@@ -75,6 +75,7 @@
   display: flex;
   align-items: flex-start; /* 上揃え */
   margin-bottom: 7px;      /* 行間の微調整 */
+  flex-wrap: nowrap;
 }
 
 /* 「素材：」などのラベル部分 */
