@@ -579,9 +579,11 @@ footer{
 }
 .footer-text{
   display: flex;
+  flex-direction: column;
   font-size: 18px;
   line-height: 1.5;
   padding-bottom: 30px;
+  gap: 20px;
 }
 .footer-logos{
   display: flex;
@@ -657,6 +659,10 @@ footer{
   }
   .footer-text-aboutonly{
     max-width: 420px;
+  }
+  .footer-text {
+    flex-direction: row; /* 広い画面は横 */
+    gap: 60px;
   }
 }
 
