@@ -183,8 +183,8 @@
   .content-wrapper {
     max-width: 1500px; /* 最大幅 */
     width: 100%;
-    padding-right: 5%;
-    padding-left: 5%;
+    padding-right: 4%;
+    padding-left: 8%;
     box-sizing: border-box;
     margin: 0 auto;
   }
@@ -213,7 +213,7 @@
     flex-direction: column;
     align-items: flex-start;
     margin-top: 0;
-    width: 155px;
+    width: 135px;
     pointer-events: auto;
   }
 
