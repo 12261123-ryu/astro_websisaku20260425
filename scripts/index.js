@@ -223,7 +223,7 @@ else {
         <img src="${thumbPath}" alt="${work.title}" loading="lazy" decoding="async">
       </div>
       <div class="work-info">
-        <span class="work-title" style="${work.school_number === 'b84' ? 'font-family: Times,"Times New Roman","YuMincho-Medium","游明朝体","游明朝","Yu Mincho","YuMincho","Hiragino Mincho ProN","ヒラギノ明朝 ProN","Noto Serif JP",serif;' : ''}">${work.title.replace(/\n/g, ' / ')}</span>
+        <span class="work-title" style="${work.school_number === 'b84' ? `font-family: Times,'Times New Roman','YuMincho-Medium','游明朝体','游明朝','Yu Mincho','YuMincho','Hiragino Mincho ProN','ヒラギノ明朝 ProN','Noto Serif JP',serif;` : ''}">${work.title.replace(/\n/g, ' / ')}</span>
         <span class="work-designer">${work.name}</span>
       </div>
     </article>
