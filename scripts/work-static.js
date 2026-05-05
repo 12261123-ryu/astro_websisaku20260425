@@ -21,10 +21,6 @@ async function loadWorkDetail() {
     //戻るリンクを書き換える(絞り込み状態を保存する)
     if (work) {
 
-      // exception_HTMLの場合は別のrender関数を呼ぶ
-      if (work.exception_HTML === 'true' || work.exception_HTML === 'TRUE') {
-        renderExceptionWorkPage(work, knownMaterials);
-      }
 
       renderRecommendations(work, works, knownMaterials);
 
@@ -199,109 +195,5 @@ window.addEventListener('load', loadWorkDetail);
 
 
 
-
-function renderExceptionWorkPage(work, knownMaterials = []) {
-  document.title = `${work.title} / 統合デザイン学科卒業・修了制作展2026 / web図録`;
-
-  const mainWindow = document.querySelector('.work-main-content');
-  if (!mainWindow) return;
-  mainWindow.classList.add('exception-page');
-
-  const masterDetail = work.Master_project ? `（${work.Master_project}）` : "";
-  const contactType = work.contact?.type?.toLowerCase().trim();
-  const contactId = work.contact?.id?.toString().trim().replace('@', '');
-  const contactUrl = contactType === 'instagram' ? `https://www.instagram.com/${contactId}/` : `https://x.com/${contactId}/`;
-  const contactText = contactType === 'instagram' ? `Instagram @${contactId}` : `X @${contactId}`;
-
-
-  const recommendBlock = document.querySelector('.recommend-part');
-  const footer = document.querySelector('footer');
-
-  // 既存のwork-partを削除して作り直す
-  mainWindow.innerHTML = '';
-
-  // 全体ブロック
-  const overviewBlock = `
-  <div class="content-wrapper work-part">
-    <div class="work-part-grid">
-      <div class="full-main-image">
-        <img src="${work.overview_image || work.thumbnail}" style="width:100%; height:auto;" alt="">
-      </div>
-      <section class="work-info-block">
-        <div id="work-title">${work.title}</div>
-        <div id="work-designer">${work.name}</div>
-        <div class="meta-info">
-          <div class="meta-row">
-            <span class="meta-label">所属：</span>
-            <span class="meta-content"><a href="/?filter=M" class="tag-link">#大学院${masterDetail}</a></span>
-          </div>
-          <div class="meta-row">
-            <span class="meta-label">連絡先：</span>
-            <span id="work-contact" class="meta-content"><a href="${contactUrl}" target="_blank" rel="noopener noreferrer">${contactText}</a></span>
-          </div>
-        </div>
-      </section>
-    </div>
-  </div>`;
-  mainWindow.insertAdjacentHTML('beforeend', overviewBlock);
-
-  // 各作品ブロック
-  if (work.sub_works && work.sub_works.length > 0) {
-    work.sub_works.forEach((sub, index) => {
-      const isLast = index === work.sub_works.length - 1;
-
-      const knowns = [];
-      const others = [];
-      sub.materials.forEach(m => {
-        const trimmedM = m.trim();
-        if (!trimmedM) return;
-        const baseM = trimmedM.replace(/（.*）|\(.*\)/, '').trim();
-        if (knownMaterials.includes(baseM)) {
-        knowns.push(`<a href="/?filter=${baseM}" class="tag-link">#${trimmedM}</a>`);
-        } else {
-          others.push(trimmedM);
-        }
-      });
-      let matParts = [];
-      if (knowns.length > 0) matParts.push(knowns.join('、'));
-      if (others.length > 0) matParts.push(`<a href="/?filter=その他" class="tag-link">#その他（${others.join('、')}）</a>`);
-      const materialsHtml = matParts.join('、');
-
-      const imagesHtml = sub.image_list.map(img => `
-        <div class="content-item sub-image-item">
-          <img src="${img}" loading="lazy" decoding="async" style="width:100%; height:auto;">
-        </div>`).join('');
-
-      const subBlock = `
-        <div class="content-wrapper work-part">
-          <div class="work-part-grid">
-            <div class="full-main-image">
-              <img src="${sub.image_list[0]}" style="width:100%; height:auto;" alt="">
-            </div>
-            <section class="work-info-block">
-              <div class="sub-work-title">${sub.title}</div>
-              <div class="sub-work-concept">${sub.concept}</div>
-              <div class="meta-info">
-                <div class="meta-row">
-                  <span class="meta-label">素材：</span>
-                  <span class="meta-content">${materialsHtml}</span>
-                </div>
-              </div>
-            </section>
-            <div class="sub-image-list">
-              ${sub.image_list.slice(1).map(img => `
-                <div class="content-item sub-image-item">
-                  <img src="${img}" loading="lazy" decoding="async" style="width:100%; height:auto;">
-                </div>`).join('')}
-            </div>
-          </div>
-          ${isLast ? '<div style="height: 180px;"></div>' : ''}
-        </div>`;
-        mainWindow.insertAdjacentHTML('beforeend', subBlock);
-    });
-  }
-  if (recommendBlock) mainWindow.appendChild(recommendBlock);
-  if (footer) mainWindow.appendChild(footer);
-}
 
 
