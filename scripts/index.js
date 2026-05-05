@@ -148,7 +148,7 @@ function renderWorks(searchKey, displayName = "", description = "", professor = 
 
   // --- A. テキストの更新 ---
   if (searchKey === "all") {
-    titleElem.innerHTML = "統合デザイン学科卒業・修了制作展<br>web図録";
+    titleElem.innerHTML = "統合デザイン学科卒業・修了制作展<br>2026&nbsp;web図録";
     if (profElem) profElem.innerText = ""; 
     descElem.innerText = "本サイトでは、2026年度多摩美術大学統合デザイン学科卒業・修了制作展で展示された作品・研究の写真・映像・コンセプトをいつでもご覧いただけます。";
   } 
